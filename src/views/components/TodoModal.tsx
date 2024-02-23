@@ -6,11 +6,9 @@ import { useDispatch } from "react-redux";
 import { todoActions } from "../../store/reducers/todoSlice";
 import { modalActions } from "../../store/reducers/modalSlice";
 
-export type TodoModalProps = {
+// export type TodoModalProps = {};
 
-};
-
-export const TodoModal = (props: TodoModalProps): React.JSX.Element => {
+export const TodoModal = (): React.JSX.Element => {
 
   const {isTodoEditModalVisible} = useAppSelector(state => state.modal);
   const [content, setContent] = useState('');

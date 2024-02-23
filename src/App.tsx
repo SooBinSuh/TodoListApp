@@ -33,17 +33,17 @@ import {TodoStackParamList} from './@types/Stacks';
 import TodoHome from './views/container/TodoHome';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useAppSelector } from './hooks';
-import { toggleTodoEditModalVisible } from './store/reducers/modalSlice';
+import TodoDetail from './views/container/TodoDetail';
+
 // import createNativeStackNavigator from '@react-navigation/native-stack/lib/typescript/src/navigators/createNativeStackNavigator';
 
 const TodoStack = createNativeStackNavigator<TodoStackParamList>();
-// const TodoStack = createNativeStackNavigator
-//MODAL VAC
+
 const TodoStackView = () => {
   return (
     <TodoStack.Navigator initialRouteName="TodoHome">
       <TodoStack.Screen name="TodoHome" component={TodoHome} />
-      <TodoStack.Screen name="TodoDetail" component={TodoHome}/>
+      <TodoStack.Screen name="TodoDetail" component={TodoDetail}/>
     </TodoStack.Navigator>
   );
 };

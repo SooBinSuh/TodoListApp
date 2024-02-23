@@ -7,12 +7,22 @@ import {useDispatch} from 'react-redux';
 import {useEffect, useMemo} from 'react';
 import Todo from '../../@types/Todo';
 import { modalActions } from '../../store/reducers/modalSlice';
+import { useNavigation } from '@react-navigation/native';
+
+
+import { RootNavigationProp, TodoStackParamList } from '../../@types/Stacks';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
 const TodoList = () => {
-  const {data, isLoading, idOfCompleteTodos} = useAppSelector(
+
+  const {data,idOfCompleteTodos} = useAppSelector(
     state => state.todos,
   );
+    const navigation = useNavigation<RootNavigationProp>();
+
   const dispatch = useDispatch();
+
+  //TODO: 해당 로직 리팩토링 필요
   const handleToggleChange = (id: number) => {
     let newArr = [...idOfCompleteTodos];
     let index = idOfCompleteTodos.indexOf(id);
@@ -24,6 +34,11 @@ const TodoList = () => {
     dispatch(todoActions.toggleCompleteById(newArr));
   };
 
+  const handleItemPress = (item:Todo)=>{
+    navigation.navigate('TodoDetail',{todo:item});
+  }
+
+  // const _props = {};
   // useD
   return (
     <ScrollView
@@ -31,7 +46,10 @@ const TodoList = () => {
       style={{flex: 1, backgroundColor: ColorConstants.background}}>
       {data.map(todo => {
         return (
-          <TodoListItem key={todo.id} item={todo} handleToggleChange={handleToggleChange}/>  
+          <Pressable key={todo.id} onPress={()=>handleItemPress(todo)}>
+            <TodoListItem  item={todo} handleToggleChange={handleToggleChange}/>  
+
+          </Pressable>
         );
       })}
     </ScrollView>
@@ -44,7 +62,7 @@ type TodoListItemProp = {
 const TodoListItem = ({item,handleToggleChange}: TodoListItemProp) => {
   const {idOfCompleteTodos} = useAppSelector(state => state.todos);
   //TODO: Rendering 최적화 필요, toggle 하는 children만 re-render하게 변경해야함
-  console.log("rendering:",item.id);
+  // console.log("rendering:",item.id);
   const isComplete = useMemo(
     () => idOfCompleteTodos.includes(item.id),
     [idOfCompleteTodos],
@@ -82,7 +100,7 @@ const TodoHome = () => {
       <TodoList />
       <Pressable
         style={{
-          height: 50,
+          height: SizeConstants.bottomButtonHeight,
           backgroundColor: 'lightblue',
           justifyContent: 'center',
           alignItems: 'center',

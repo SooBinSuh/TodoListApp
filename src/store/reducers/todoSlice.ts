@@ -1,3 +1,4 @@
+import { UpdateTodoRequestBody } from './../../@types/request/todo/UpdateTodoRequestBody';
 import {PayloadAction, createSlice} from '@reduxjs/toolkit';
 import Todo from '../../@types/Todo';
 import { CreateTodoRequestBody } from '../../@types/request/todo/CreateTodoRequestBody';
@@ -31,10 +32,6 @@ const todoSlice = createSlice({
       state.isLoading = false;
       state.idOfCompleteTodos = action.payload;
     },
-    toggleCompleteByIdFail:(state,action:PayloadAction<Error>)=>{
-      state.isLoading = false;
-      state.error = action.payload;
-    },
     loadGetTodosRequest:(state)=>{
       state.isLoading = true;
     },
@@ -43,11 +40,6 @@ const todoSlice = createSlice({
       state.data = action.payload.todos;
       state.idOfCompleteTodos = action.payload.idOfCompletedTodos;
     },
-    loadGetTodosFail:(state,action:PayloadAction<Error>)=>{
-      state.isLoading = false;
-      state.data = [];
-      state.error = action.payload;
-    },
     loadCreateTodoRequest:(state,action:PayloadAction<CreateTodoRequestBody>)=>{
       state.isLoading = true;
     },
@@ -55,10 +47,17 @@ const todoSlice = createSlice({
       state.isLoading = false;
       state.data.push(action.payload);
     },
-    loadCreateTodoRequestFail:(state,action:PayloadAction<Error>)=>{
-      state.isLoading = false;
-      state.error = action.payload;
+    loadUpdateTodoRequest:(state, action:PayloadAction<UpdateTodoRequestBody>)=>{
+      state.isLoading = true;
     },
+    loadUpdateTodoRequestSuccess:(state,action:PayloadAction<{index:number,todo:Todo}>)=>{
+      state.isLoading = false;
+      state.data[action.payload.index] = action.payload.todo;
+    },
+    loadTodoRequestFail:(state,action:PayloadAction<Error>)=>{
+      state.isLoading = false;
+      state.error = action.payload
+    }
   },
 });
 

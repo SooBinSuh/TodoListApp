@@ -41,6 +41,7 @@ const ColorConstants = {
   black500: '#5C646C',
   black700: '#3A444E',
 
+  primary:'#668CFF',
 };
 const SizeConstants = {
   paddingSmall: 2,
@@ -49,5 +50,7 @@ const SizeConstants = {
   borderRadius: 8,
   screenWidth: Dimensions.get('window').width,
   screenHeight: Dimensions.get('window').height,
+  
+  bottomButtonHeight:50,
 };
 export {FontConstants, ColorConstants, SizeConstants,AsyncConstants};

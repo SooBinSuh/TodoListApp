@@ -1,26 +1,35 @@
-import { KeyboardAvoidingView, Modal, Pressable, Text, TextInput, TouchableWithoutFeedback, View } from "react-native";
-import { ColorConstants, SizeConstants } from "../../constants/Constants";
+import {
+  KeyboardAvoidingView,
+  Modal,
+  Pressable,
+  Text,
+  TextInput,
+  TouchableWithoutFeedback,
+  View,
+} from 'react-native';
+import {ColorConstants, SizeConstants} from '../../constants/Constants';
 
 export type VTodoInputModalProps = {
-    content: string;
-    onModalDismiss: () => void;
-    isModalVisible: boolean;
-    isCreatePressable:boolean;
-    onBackgroundPress: () => void;
-    onChangeText: (t:string) => void;
-    onCreatePress: () => void;
-    
-  };
+  content: string;
+  onModalDismiss: () => void;
+  isModalVisible: boolean;
+  isCreatePressable: boolean;
+  onBackgroundPress: () => void;
+  onChangeText: (t: string) => void;
+  onCreatePress: () => void;
+};
 
-
-export const VTodoInputModal = (props: VTodoInputModalProps) : React.JSX.Element => {
-    return <Modal
-    transparent={true}
+export const VTodoInputModal = (
+  props: VTodoInputModalProps,
+): React.JSX.Element => {
+  return (
+    <Modal
+      transparent={true}
       onDismiss={props.onModalDismiss}
-      visible={props.isModalVisible}
-      >
+      visible={props.isModalVisible}>
       {/* Modal */}
-      <Pressable style={{flex: 1}} onPress={props.onBackgroundPress}>
+      <Pressable style={{flex: 1}} onPress={props.onBackgroundPress}
+      >
         <View style={{flex: 1}}>
           <KeyboardAvoidingView
             behavior="padding"
@@ -35,8 +44,8 @@ export const VTodoInputModal = (props: VTodoInputModalProps) : React.JSX.Element
                   marginHorizontal: SizeConstants.screenWidth * 0.1,
                   padding: SizeConstants.paddingLarge,
                   borderRadius: SizeConstants.borderRadius,
-                  backgroundColor:ColorConstants.background,
-                  borderWidth:1,
+                  backgroundColor: ColorConstants.backgroundMedium,
+                  borderWidth: 1,
                 }}>
                 <TextInput
                   autoFocus={true}
@@ -47,13 +56,13 @@ export const VTodoInputModal = (props: VTodoInputModalProps) : React.JSX.Element
                   onChangeText={props.onChangeText}
                   style={{
                     flex: 1,
-                    backgroundColor: ColorConstants.backgroundLight,
+                    backgroundColor: ColorConstants.background,
                     marginBottom: SizeConstants.paddingLarge,
                     padding: SizeConstants.paddingRegular,
                   }}
                 />
                 <Pressable
-                  disabled = {!props.isCreatePressable}
+                  disabled={!props.isCreatePressable}
                   onPress={props.onCreatePress}
                   style={{
                     backgroundColor: ColorConstants.green30,
@@ -69,7 +78,8 @@ export const VTodoInputModal = (props: VTodoInputModalProps) : React.JSX.Element
           </KeyboardAvoidingView>
         </View>
       </Pressable>
-    </Modal>;
-  };
+    </Modal>
+  );
+};
 
-  export default VTodoInputModal
+export default VTodoInputModal;
