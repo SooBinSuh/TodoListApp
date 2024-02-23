@@ -6,19 +6,16 @@ import {todoActions} from '../../store/reducers/todoSlice';
 import {useDispatch} from 'react-redux';
 import {useEffect, useMemo} from 'react';
 import Todo from '../../@types/Todo';
-import { modalActions } from '../../store/reducers/modalSlice';
-import { useNavigation } from '@react-navigation/native';
+import {modalActions} from '../../store/reducers/modalSlice';
+import {useNavigation} from '@react-navigation/native';
 
-
-import { RootNavigationProp, TodoStackParamList } from '../../@types/Stacks';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import {RootNavigationProp, TodoStackParamList} from '../../@types/Stacks';
+import {NativeStackNavigationProp} from '@react-navigation/native-stack';
+import createYesOrNoAlert from '../components/MyAlert';
 
 const TodoList = () => {
-
-  const {data,idOfCompleteTodos} = useAppSelector(
-    state => state.todos,
-  );
-    const navigation = useNavigation<RootNavigationProp>();
+  const {data, idOfCompleteTodos} = useAppSelector(state => state.todos);
+  const navigation = useNavigation<RootNavigationProp>();
 
   const dispatch = useDispatch();
 
@@ -34,21 +31,18 @@ const TodoList = () => {
     dispatch(todoActions.toggleCompleteById(newArr));
   };
 
-  const handleItemPress = (item:Todo)=>{
-    navigation.navigate('TodoDetail',{todo:item});
-  }
+  const handleItemPress = (item: Todo) => {
+    navigation.navigate('TodoDetail', {todo: item});
+  };
 
-  // const _props = {};
-  // useD
   return (
     <ScrollView
       contentContainerStyle={{paddingHorizontal: SizeConstants.paddingRegular}}
       style={{flex: 1, backgroundColor: ColorConstants.background}}>
       {data.map(todo => {
         return (
-          <Pressable key={todo.id} onPress={()=>handleItemPress(todo)}>
-            <TodoListItem  item={todo} handleToggleChange={handleToggleChange}/>  
-
+          <Pressable key={todo.id} onPress={() => handleItemPress(todo)}>
+            <TodoListItem item={todo} handleToggleChange={handleToggleChange} />
           </Pressable>
         );
       })}
@@ -57,31 +51,68 @@ const TodoList = () => {
 };
 type TodoListItemProp = {
   item: Todo;
-  handleToggleChange:(i:number)=>void;
+  handleToggleChange: (i: number) => void;
 };
-const TodoListItem = ({item,handleToggleChange}: TodoListItemProp) => {
+
+type VTodoListItemProp = {
+  showDeleteAlert: () => void;
+};
+const TodoListItem = ({item, handleToggleChange}: TodoListItemProp) => {
   const {idOfCompleteTodos} = useAppSelector(state => state.todos);
+  const dispatch = useDispatch();
   //TODO: Rendering 최적화 필요, toggle 하는 children만 re-render하게 변경해야함
   // console.log("rendering:",item.id);
   const isComplete = useMemo(
     () => idOfCompleteTodos.includes(item.id),
     [idOfCompleteTodos],
   );
+
+  const _props: VTodoListItemProp = {
+    showDeleteAlert: () => {
+      createYesOrNoAlert({
+        title: '삭제',
+        body: `${item.id} 아이템을 삭제하시겠습니까?`,
+        handleOK: () => {
+          dispatch(
+            todoActions.loadDeleteTodoRequest({
+              id: item.id,
+            }),
+          );
+          //DELTE
+        },
+        handleNO: () => {
+          //nothing
+        },
+      });
+    },
+  };
   return (
     <View
-    style={{
-      height: 80,
-      justifyContent: 'center',
-    }}>
-    <View style={{flexDirection: 'row'}}>
-      <Text style={{flex: 1}}>{item.content}</Text>
-      <Switch
-        value={isComplete}
-        onValueChange={() => handleToggleChange(item.id)}
-      />
+      style={{
+        height: 80,
+        justifyContent: 'center',
+      }}>
+      <View style={{flexDirection: 'row', alignItems: 'center'}}>
+        <Text style={{flex: 1}}>{item.content}</Text>
+        <Pressable
+          onPress={_props.showDeleteAlert}
+          style={{
+            padding: 8,
+            backgroundColor: ColorConstants.warning30,
+            borderRadius: SizeConstants.borderRadius,
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginEnd: SizeConstants.paddingRegular,
+          }}>
+          <Text>삭제</Text>
+        </Pressable>
+        <Switch
+          value={isComplete}
+          onValueChange={() => handleToggleChange(item.id)}
+        />
+      </View>
     </View>
-  </View>
-  )
+  );
 };
 const TodoHome = () => {
   const dispatch = useDispatch();

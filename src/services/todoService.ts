@@ -19,7 +19,7 @@ export const apiUpdateTodo = async (param: UpdateTodoRequestBody) => {
 };
 
 export const apiDeleteTodo = async (param: DeleteTodoRequestBody) => {
-    return await axiosInstance.patch<Todo>(`/todo/${param.id}/`);
+    return await axiosInstance.delete<Todo>(`/todo/${param.id}/`);
 };
 
 export const writeTodosToStorage = async (value: number[]) => {

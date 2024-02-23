@@ -1,12 +1,12 @@
-import { UpdateTodoRequestBody } from './../../@types/request/todo/UpdateTodoRequestBody';
+import {UpdateTodoRequestBody} from './../../@types/request/todo/UpdateTodoRequestBody';
 import {PayloadAction, createSlice} from '@reduxjs/toolkit';
 import Todo from '../../@types/Todo';
-import { CreateTodoRequestBody } from '../../@types/request/todo/CreateTodoRequestBody';
-
+import {CreateTodoRequestBody} from '../../@types/request/todo/CreateTodoRequestBody';
+import DeleteTodoRequestBody from '../../@types/request/todo/DeleteTodoRequestBody';
 
 export type TodoStateType = {
   isLoading: boolean;
-  error: NetworkError|undefined; 
+  error: NetworkError | undefined;
   data: Todo[];
   idOfCompleteTodos: number[];
 };
@@ -15,8 +15,8 @@ export type TodoStateType = {
 const initialState: TodoStateType = {
   data: [],
   idOfCompleteTodos: [],
-  isLoading:false,
-  error:undefined,
+  isLoading: false,
+  error: undefined,
 };
 
 const todoSlice = createSlice({
@@ -28,36 +28,68 @@ const todoSlice = createSlice({
       // const index = state.data.findIndex(i => i.id == action.payload);
       // state.data[index].isComplete = !state.data[index].isComplete;
     },
-    toggleCompleteByIdSuccess:(state,action:PayloadAction<number[]>)=>{
+    toggleCompleteByIdSuccess: (state, action: PayloadAction<number[]>) => {
       state.isLoading = false;
       state.idOfCompleteTodos = action.payload;
     },
-    loadGetTodosRequest:(state)=>{
+    loadGetTodosRequest: state => {
       state.isLoading = true;
     },
-    loadGetTodosSuccess:(state, action:PayloadAction<{todos:Todo[],idOfCompletedTodos:number[]}>)=>{
+    loadGetTodosSuccess: (
+      state,
+      action: PayloadAction<{todos: Todo[]; idOfCompletedTodos: number[]}>,
+    ) => {
       state.isLoading = false;
       state.data = action.payload.todos;
       state.idOfCompleteTodos = action.payload.idOfCompletedTodos;
     },
-    loadCreateTodoRequest:(state,action:PayloadAction<CreateTodoRequestBody>)=>{
+    loadCreateTodoRequest: (
+      state,
+      action: PayloadAction<CreateTodoRequestBody>,
+    ) => {
       state.isLoading = true;
     },
-    loadCreateTodoRequestSuccess:(state,action:PayloadAction<Todo>)=>{
+    loadCreateTodoRequestSuccess: (state, action: PayloadAction<Todo>) => {
       state.isLoading = false;
       state.data.push(action.payload);
     },
-    loadUpdateTodoRequest:(state, action:PayloadAction<UpdateTodoRequestBody>)=>{
+    loadUpdateTodoRequest: (
+      state,
+      action: PayloadAction<UpdateTodoRequestBody>,
+    ) => {
       state.isLoading = true;
     },
-    loadUpdateTodoRequestSuccess:(state,action:PayloadAction<{index:number,todo:Todo}>)=>{
+    loadUpdateTodoRequestSuccess: (
+      state,
+      action: PayloadAction<{index: number; todo: Todo}>,
+    ) => {
       state.isLoading = false;
       state.data[action.payload.index] = action.payload.todo;
     },
-    loadTodoRequestFail:(state,action:PayloadAction<Error>)=>{
+    loadTodoRequestFail: (state, action: PayloadAction<Error>) => {
       state.isLoading = false;
-      state.error = action.payload
-    }
+      state.error = action.payload;
+    },
+    loadDeleteTodoRequest: (
+      state,
+      action: PayloadAction<DeleteTodoRequestBody>,
+    ) => {
+      state.isLoading = true;
+    },
+    loadDeleteTodoRequestSuccess: (
+      state,
+      action: PayloadAction<{
+        indexOfTodos: number;
+        indexOfCompleteTodos: number;
+      }>,
+    ) => {
+      state.isLoading = false;
+      state.data.splice(action.payload.indexOfTodos, 1);
+      state.idOfCompleteTodos.splice(
+        action.payload.indexOfCompleteTodos,
+        action.payload.indexOfCompleteTodos > -1 ? 1 : 0,
+      );
+    },
   },
 });
 
