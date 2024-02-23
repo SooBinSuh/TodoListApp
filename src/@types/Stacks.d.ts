@@ -1,5 +1,5 @@
-export type MainStackParamList = {
-    Home:undefined;
+export type TodoStackParamList = {
+    TodoHome:undefined;
     TodoDetail:undefined;
 }
 

@@ -5,63 +5,68 @@
  * @format
  */
 
-import { NavigationContainer } from '@react-navigation/native';
-import React from 'react';
+import {NavigationContainer} from '@react-navigation/native';
+import React, {useEffect, useState} from 'react';
 import type {PropsWithChildren} from 'react';
 import {
+  Button,
+  Keyboard,
+  KeyboardAvoidingView,
+  Modal,
+  Pressable,
   SafeAreaView,
   ScrollView,
   StatusBar,
   StyleSheet,
   Text,
+  TextInput,
+  TouchableWithoutFeedback,
   useColorScheme,
   View,
 } from 'react-native';
 
-import {
-  Colors,
-  DebugInstructions,
-  Header,
-  LearnMoreLinks,
-  ReloadInstructions,
-} from 'react-native/Libraries/NewAppScreen';
+import TodoModal from './views/components/TodoModal';
+import {Provider, useSelector} from 'react-redux';
+import store from './store';
+// import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import {TodoStackParamList} from './@types/Stacks';
+import TodoHome from './views/container/TodoHome';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { useAppSelector } from './hooks';
+import { toggleTodoEditModalVisible } from './store/modalSlice';
+// import createNativeStackNavigator from '@react-navigation/native-stack/lib/typescript/src/navigators/createNativeStackNavigator';
 
+const TodoStack = createNativeStackNavigator<TodoStackParamList>();
+// const TodoStack = createNativeStackNavigator
+//MODAL VAC
+const TodoStackView = () => {
+  return (
+    <TodoStack.Navigator initialRouteName="TodoHome">
+      <TodoStack.Screen name="TodoHome" component={TodoHome} />
+      <TodoStack.Screen name="TodoDetail" component={TodoHome}/>
+    </TodoStack.Navigator>
+  );
+};
 
 function App(): React.JSX.Element {
-  const isDarkMode = useColorScheme() === 'dark';
-
-  const backgroundStyle = {
-    backgroundColor: isDarkMode ? Colors.darker : Colors.lighter,
-  };
-
+  // const [isModalVisible, setModalVisible] = useState(false);
+  
   return (
-    <NavigationContainer>
-      <SafeAreaView style={{flex:1}}>
-        <View style={{flex:1}}>
-          <Text>hello world</Text>
-        </View>
-      </SafeAreaView>
-    </NavigationContainer>
+    <Provider store={store}>
+      <NavigationContainer>
+        <SafeAreaView style={{flex: 1}}>
+          <View style={{flex: 1}}>
+            <TodoStackView />
+            <TodoModal
+              // handleCloseModal={toggleTodoEditModalVisible}
+            />
+          </View>
+        </SafeAreaView>
+      </NavigationContainer>
+    </Provider>
   );
 }
 
-const styles = StyleSheet.create({
-  sectionContainer: {
-    marginTop: 32,
-    paddingHorizontal: 24,
-  },
-  sectionTitle: {
-    fontSize: 24,
-    fontWeight: '600',
-  },
-  sectionDescription: {
-    marginTop: 8,
-    fontSize: 18,
-    fontWeight: '400',
-  },
-  highlight: {
-    fontWeight: '700',
-  },
-});
+const styles = StyleSheet.create({});
 
 export default App;
