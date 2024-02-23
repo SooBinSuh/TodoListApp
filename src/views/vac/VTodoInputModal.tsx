@@ -5,14 +5,17 @@ export type VTodoInputModalProps = {
     content: string;
     onModalDismiss: () => void;
     isModalVisible: boolean;
+    isCreatePressable:boolean;
     onBackgroundPress: () => void;
     onChangeText: (t:string) => void;
     onCreatePress: () => void;
+    
   };
 
 
 export const VTodoInputModal = (props: VTodoInputModalProps) : React.JSX.Element => {
     return <Modal
+    transparent={true}
       onDismiss={props.onModalDismiss}
       visible={props.isModalVisible}
       >
@@ -32,6 +35,8 @@ export const VTodoInputModal = (props: VTodoInputModalProps) : React.JSX.Element
                   marginHorizontal: SizeConstants.screenWidth * 0.1,
                   padding: SizeConstants.paddingLarge,
                   borderRadius: SizeConstants.borderRadius,
+                  backgroundColor:ColorConstants.background,
+                  borderWidth:1,
                 }}>
                 <TextInput
                   autoFocus={true}
@@ -48,6 +53,7 @@ export const VTodoInputModal = (props: VTodoInputModalProps) : React.JSX.Element
                   }}
                 />
                 <Pressable
+                  disabled = {!props.isCreatePressable}
                   onPress={props.onCreatePress}
                   style={{
                     backgroundColor: ColorConstants.green30,

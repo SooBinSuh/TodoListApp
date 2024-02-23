@@ -2,10 +2,11 @@ import {Button, Pressable, ScrollView, Switch, Text, View} from 'react-native';
 import {useAppSelector} from '../../hooks';
 import {ColorConstants, SizeConstants} from '../../constants/Constants';
 import {todoActions} from '../../store/reducers/todoSlice';
-import {toggleTodoEditModalVisible} from '../../store/reducers/modalSlice';
+
 import {useDispatch} from 'react-redux';
 import {useEffect, useMemo} from 'react';
 import Todo from '../../@types/Todo';
+import { modalActions } from '../../store/reducers/modalSlice';
 
 const TodoList = () => {
   const {data, isLoading, idOfCompleteTodos} = useAppSelector(
@@ -48,13 +49,10 @@ const TodoListItem = ({item,handleToggleChange}: TodoListItemProp) => {
     () => idOfCompleteTodos.includes(item.id),
     [idOfCompleteTodos],
   );
-
-
   return (
     <View
     style={{
       height: 80,
-      backgroundColor: 'red',
       justifyContent: 'center',
     }}>
     <View style={{flexDirection: 'row'}}>
@@ -73,14 +71,11 @@ const TodoHome = () => {
 
   useEffect(() => {
     console.log('in useeffect');
-    // dispatch(todoActions.readTodosFromStorage());
+    dispatch(todoActions.loadGetTodosRequest());
   }, []);
 
   const handleShowModalButtonPress = () => {
-    console.log('click');
-    // dispatch(toggleTodoEditModalVisible());
-    // dispatch(todoActions.readTodosFromStorage());
-    dispatch(todoActions.loadGetTodosRequest());
+    dispatch(modalActions.toggleTodoEditModalVisible());
   };
   return (
     <View style={{flex: 1}}>

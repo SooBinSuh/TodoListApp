@@ -5,11 +5,8 @@ import todoSlice from './todoSlice';
 import modalSlice from './modalSlice';
 import createSagaMiddleware from 'redux-saga';
 import todoSaga from '../sagas/todosSaga';
-import rootSaga from '../sagas';
-// import rootSaga from '../sagas';
-// import todoReducer from "./todoSlice";
 
-// const rootReducer = combineReducers({todos});
+
 
 const createStore = () => {
   const sagaMiddleware = createSagaMiddleware();

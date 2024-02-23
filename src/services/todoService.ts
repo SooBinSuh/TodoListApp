@@ -1,13 +1,18 @@
 import { AxiosResponse } from 'axios';
 import {axiosInstance} from '.';
 import Todo from '../@types/Todo';
-import RequestResponse from '../@types/responseType';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AsyncConstants } from '../constants/Constants';
+import { CreateTodoRequestBody } from '../@types/request/todo/CreateTodoRequestBody';
 
 export const apiGetTodos = async () => {
    return await axiosInstance.get<Todo[]>(`/todo/`);
 };
+
+export const apiCreateTodo = async (param:CreateTodoRequestBody) =>{
+    return await axiosInstance.post<Todo>(`/todo/`,{content:param.content});
+}
+
 
 export const writeTodosToStorage = async (value:number[])=>{
     try{
