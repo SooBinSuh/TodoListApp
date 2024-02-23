@@ -27,13 +27,13 @@ import {
 
 import TodoModal from './views/components/TodoModal';
 import {Provider, useSelector} from 'react-redux';
-import store from './store';
+import store from './store/reducers';
 // import {createNativeStackNavigator} from '@react-navigation/native-stack';
 import {TodoStackParamList} from './@types/Stacks';
 import TodoHome from './views/container/TodoHome';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useAppSelector } from './hooks';
-import { toggleTodoEditModalVisible } from './store/modalSlice';
+import { toggleTodoEditModalVisible } from './store/reducers/modalSlice';
 // import createNativeStackNavigator from '@react-navigation/native-stack/lib/typescript/src/navigators/createNativeStackNavigator';
 
 const TodoStack = createNativeStackNavigator<TodoStackParamList>();

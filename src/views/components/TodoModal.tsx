@@ -1,7 +1,7 @@
 import { useState } from "react";
 import VTodoInputModal, { VTodoInputModalProps } from "../vac/VTodoInputModal";
 import { useAppSelector } from "../../hooks";
-import { toggleTodoEditModalVisible } from "../../store/modalSlice";
+import { toggleTodoEditModalVisible } from "../../store/reducers/modalSlice";
 import { useDispatch } from "react-redux";
 
 export type TodoModalProps = {

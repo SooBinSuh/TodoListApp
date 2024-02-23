@@ -25,6 +25,11 @@ const FontConstants = {
   weightSemiBold : '600' as FontWeight,
   weightExtraBold: '900' as FontWeight,
 };
+
+const AsyncConstants = {
+  completedTodoIDs:'completedIds',
+}
+
 const ColorConstants = {
   background: isDarkMode ? '#333333' : '#efefef',
   backgroundMedium: isDarkMode ? '#666666' : '#dddddd',
@@ -45,4 +50,4 @@ const SizeConstants = {
   screenWidth: Dimensions.get('window').width,
   screenHeight: Dimensions.get('window').height,
 };
-export {FontConstants, ColorConstants, SizeConstants};
+export {FontConstants, ColorConstants, SizeConstants,AsyncConstants};

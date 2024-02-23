@@ -1,6 +1,6 @@
-interface Todo{
-    isComplete:boolean;
-}
+// interface Todo{
+//     isComplete:boolean;
+// }
 interface Todo{
     id:number;
     content:string;
