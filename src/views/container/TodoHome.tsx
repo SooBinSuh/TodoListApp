@@ -1,14 +1,20 @@
 import {
   Button,
   FlatList,
+  LayoutChangeEvent,
   Pressable,
   ScrollView,
   Switch,
   Text,
+  TextInput,
   View,
 } from 'react-native';
 import {useAppSelector} from '../../hooks';
-import {ColorConstants, SizeConstants} from '../../constants/Constants';
+import {
+  ColorConstants,
+  FontConstants,
+  SizeConstants,
+} from '../../constants/Constants';
 import {todoActions} from '../../store/reducers/todoSlice';
 
 import {useDispatch} from 'react-redux';
@@ -25,8 +31,6 @@ import {
   Dispatch,
   current,
 } from '@reduxjs/toolkit';
-
-
 
 //Promise를 반환하는 Wrapper
 const PromisableActionWrapper = <Type extends string, Payload>(
@@ -47,7 +51,9 @@ const PromisableActionWrapper = <Type extends string, Payload>(
 const TodoList = () => {
   const _pageSize = 10;
   const _initialPageNum = 0;
-  const {data, idOfCompleteTodos,isLoading} = useAppSelector(state => state.todos);
+  const {data, idOfCompleteTodos, isLoading} = useAppSelector(
+    state => state.todos,
+  );
   const [currentPage, setCurrentPage] = useState(_initialPageNum);
   const navigation = useNavigation<RootNavigationProp>();
   useEffect(() => {
@@ -87,8 +93,11 @@ const TodoList = () => {
       .catch(() => {});
   };
   const handleRefresh = () => {
-    PromisableActionWrapper(dispatch,todoActions.loadRefreshTodosRequest,{pageSize:_pageSize})
-    .then(()=>setCurrentPage(_initialPageNum+1)).catch(()=>{});
+    PromisableActionWrapper(dispatch, todoActions.loadRefreshTodosRequest, {
+      pageSize: _pageSize,
+    })
+      .then(() => setCurrentPage(_initialPageNum + 1))
+      .catch(() => {});
   };
 
   const handleItemPress = (item: Todo) => {
@@ -101,15 +110,13 @@ const TodoList = () => {
       data={data}
       refreshing={isLoading}
       renderItem={({item, index}) => (
-        <Pressable
-          style={{height: 200}}
-          onPress={() => handleItemPress(item)}>
+        <Pressable style={{height: 200}} onPress={() => handleItemPress(item)}>
           <TodoListItem item={item} handleToggleChange={handleToggleChange} />
         </Pressable>
       )}
-      keyExtractor={item=>`${item.id}`}
+      keyExtractor={item => `${item.id}`}
       onEndReached={() => handleOnEndReached()}
-      onRefresh={()=>handleRefresh()}
+      onRefresh={() => handleRefresh()}
     />
   );
 };
@@ -123,7 +130,8 @@ type VTodoListItemProp = {
   handleEditPress: () => void;
 };
 const TodoListItem = ({item, handleToggleChange}: TodoListItemProp) => {
-  const {idOfCompleteTodos} = useAppSelector(state => state.todos);
+  const {idOfCompleteTodos,data} = useAppSelector(state => state.todos);
+
   const dispatch = useDispatch();
   //TODO: Rendering 최적화 필요, toggle 하는 children만 re-render하게 Store 데이터 구조를 변경해야 함.
   const isComplete = useMemo(
@@ -160,39 +168,59 @@ const TodoListItem = ({item, handleToggleChange}: TodoListItemProp) => {
   return (
     <View
       style={{
-        height: 80,
+        flex: 1,
         justifyContent: 'center',
+        borderBottomColor: 'black',
+        borderBottomWidth: data.slice(-1).shift() == item  ? 0 : 1,
       }}>
-      <View style={{flexDirection: 'row', alignItems: 'center'}}>
-        <Text style={{flex: 1}}>{item.content}</Text>
-        <Pressable
-          onPress={_props.handleEditPress}
+      <View
+        style={{
+          flex: 1,
+          flexDirection: 'row',
+          alignItems: 'center',
+        }}>
+        <Text
           style={{
-            padding: 8,
-            backgroundColor: ColorConstants.green30,
-            borderRadius: SizeConstants.borderRadius,
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginEnd: SizeConstants.paddingRegular,
-          }}>
-          <Text>수정</Text>
-        </Pressable>
-        <Pressable
-          onPress={_props.handleDeletePress}
-          style={{
-            padding: 8,
-            backgroundColor: ColorConstants.warning30,
-            borderRadius: SizeConstants.borderRadius,
-            justifyContent: 'center',
-            alignItems: 'center',
-            marginEnd: SizeConstants.paddingRegular,
-          }}>
-          <Text>삭제</Text>
-        </Pressable>
-        <Switch
-          value={isComplete}
-          onValueChange={() => handleToggleChange(item.id)}
-        />
+            flex: 1,
+            fontSize: FontConstants.sizeTitle,
+          }}
+          numberOfLines={4}
+          ellipsizeMode="middle">
+          {item.content}
+        </Text>
+        <View
+          style={{flexDirection: 'row'}}
+          //BUTTONS
+        >
+          <Pressable
+            onPress={_props.handleEditPress}
+            style={{
+              padding: 8,
+              backgroundColor: ColorConstants.green30,
+              borderRadius: SizeConstants.borderRadius,
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginEnd: SizeConstants.paddingRegular,
+            }}>
+            <Text>수정</Text>
+          </Pressable>
+          <Pressable
+            onPress={_props.handleDeletePress}
+            style={{
+              padding: 8,
+              backgroundColor: ColorConstants.warning30,
+              borderRadius: SizeConstants.borderRadius,
+              justifyContent: 'center',
+              alignItems: 'center',
+              marginEnd: SizeConstants.paddingRegular,
+            }}>
+            <Text>삭제</Text>
+          </Pressable>
+          <Switch
+            value={isComplete}
+            onValueChange={() => handleToggleChange(item.id)}
+          />
+        </View>
       </View>
     </View>
   );
