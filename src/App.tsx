@@ -42,12 +42,13 @@ const TodoStack = createNativeStackNavigator<TodoStackParamList>();
 const TodoStackView = () => {
   const error = useAppSelector(state=>state.todos.error);
   useEffect(()=>{
+    //NOTE: 디버깅용 State.Error 출력
     console.log("error!:",error);
   },[error])
   return (
     <TodoStack.Navigator initialRouteName="TodoHome">
-      <TodoStack.Screen name="TodoHome" component={TodoHome} />
-      <TodoStack.Screen name="TodoDetail" component={TodoDetail}/>
+      <TodoStack.Screen name="TodoHome" component={TodoHome} options={{headerTitle:"할일"}} />
+      <TodoStack.Screen name="TodoDetail" component={TodoDetail} options={{headerTitle:"상세 정보"}}/>
     </TodoStack.Navigator>
   );
 };

@@ -26,7 +26,6 @@ export const VTodoInputModal = (
   return (
     <Modal
       transparent={true}
-      // onDismiss={props.onModalDismiss}
       visible={props.isModalVisible}>
       {/* Modal */}
       <Pressable style={{flex: 1}} onPress={props.onBackgroundPress}

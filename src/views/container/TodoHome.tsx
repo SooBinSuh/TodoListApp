@@ -31,6 +31,8 @@ import {
   Dispatch,
   current,
 } from '@reduxjs/toolkit';
+import VTodoListItem, { VTodoListItemProp } from '../vac/VTodoListItem';
+import TodoListItem from '../components/TodoListItem';
 
 //Promise를 반환하는 Wrapper
 const PromisableActionWrapper = <Type extends string, Payload>(
@@ -120,111 +122,10 @@ const TodoList = () => {
     />
   );
 };
-type TodoListItemProp = {
-  item: Todo;
-  handleToggleChange: (i: number) => void;
-};
 
-type VTodoListItemProp = {
-  handleDeletePress: () => void;
-  handleEditPress: () => void;
-};
-const TodoListItem = ({item, handleToggleChange}: TodoListItemProp) => {
-  const {idOfCompleteTodos,data} = useAppSelector(state => state.todos);
 
-  const dispatch = useDispatch();
-  //TODO: Rendering 최적화 필요, toggle 하는 children만 re-render하게 Store 데이터 구조를 변경해야 함.
-  const isComplete = useMemo(
-    () => idOfCompleteTodos.includes(item.id),
-    [idOfCompleteTodos],
-  );
 
-  const _props: VTodoListItemProp = {
-    handleDeletePress: () => {
-      createYesOrNoAlert({
-        title: '삭제',
-        body: `${item.id} 아이템을 삭제하시겠습니까?`,
-        handleOK: () => {
-          dispatch(
-            todoActions.loadDeleteTodoRequest({
-              id: item.id,
-            }),
-          );
-        },
-        handleNO: () => {},
-      });
-    },
-    handleEditPress: () => {
-      console.log('will edit!');
-      dispatch(
-        modalActions.toggleTodoEditModalVisible({
-          content: item.content,
-          mode: TodoEditModalMode.edit,
-          id: item.id,
-        }),
-      );
-    },
-  };
-  return (
-    <View
-      style={{
-        flex: 1,
-        justifyContent: 'center',
-        borderBottomColor: 'black',
-        borderBottomWidth: data.slice(-1).shift() == item  ? 0 : 1,
-      }}>
-      <View
-        style={{
-          flex: 1,
-          flexDirection: 'row',
-          alignItems: 'center',
-        }}>
-        <Text
-          style={{
-            flex: 1,
-            fontSize: FontConstants.sizeTitle,
-          }}
-          numberOfLines={4}
-          ellipsizeMode="middle">
-          {item.content}
-        </Text>
-        <View
-          style={{flexDirection: 'row'}}
-          //BUTTONS
-        >
-          <Pressable
-            onPress={_props.handleEditPress}
-            style={{
-              padding: 8,
-              backgroundColor: ColorConstants.green30,
-              borderRadius: SizeConstants.borderRadius,
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginEnd: SizeConstants.paddingRegular,
-            }}>
-            <Text>수정</Text>
-          </Pressable>
-          <Pressable
-            onPress={_props.handleDeletePress}
-            style={{
-              padding: 8,
-              backgroundColor: ColorConstants.warning30,
-              borderRadius: SizeConstants.borderRadius,
-              justifyContent: 'center',
-              alignItems: 'center',
-              marginEnd: SizeConstants.paddingRegular,
-            }}>
-            <Text>삭제</Text>
-          </Pressable>
-          <Switch
-            value={isComplete}
-            onValueChange={() => handleToggleChange(item.id)}
-          />
-        </View>
-      </View>
-    </View>
-  );
-};
+
 const TodoHome = () => {
   const dispatch = useDispatch();
   const {data, isLoading} = useAppSelector(state => state.todos);
@@ -248,7 +149,6 @@ const TodoHome = () => {
           alignItems: 'center',
         }}
         onPress={handleShowModalButtonPress}>
-        <Text>{isLoading ? 'isloading' : 'not loading'}</Text>
         <Text>추가하기</Text>
       </Pressable>
     </View>
