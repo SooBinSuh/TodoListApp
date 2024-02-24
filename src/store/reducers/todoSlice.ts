@@ -28,10 +28,10 @@ const todoSlice = createSlice({
   initialState,
   reducers: {
     toggleCompleteById: (state, action: PayloadAction<number[]>) => {
-      state.isLoading = true;
+      // state.isLoading = true;
     },
     toggleCompleteByIdSuccess: (state, action: PayloadAction<number[]>) => {
-      state.isLoading = false;
+      // state.isLoading = false;
       state.idOfCompleteTodos = action.payload;
     },
     loadGetTodosRequest: state => {

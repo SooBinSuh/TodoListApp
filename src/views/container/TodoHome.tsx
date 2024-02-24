@@ -51,7 +51,6 @@ const TodoList = () => {
   const [currentPage, setCurrentPage] = useState(_initialPageNum);
   const navigation = useNavigation<RootNavigationProp>();
   useEffect(() => {
-    console.log("HERE");
     PromisableActionWrapper(dispatch, todoActions.loadGetPagedTodosRequest, {
       page: currentPage,
       pageSize: _pageSize,
@@ -78,8 +77,6 @@ const TodoList = () => {
     dispatch(todoActions.toggleCompleteById(newArr));
   };
   const handleOnEndReached = () => {
-    console.log('onEndReached!current PAge:', currentPage);
-
     PromisableActionWrapper(dispatch, todoActions.loadGetPagedTodosRequest, {
       page: currentPage,
       pageSize: _pageSize,
@@ -90,10 +87,8 @@ const TodoList = () => {
       .catch(() => {});
   };
   const handleRefresh = () => {
-    console.log('swiped UP for refresh');
     PromisableActionWrapper(dispatch,todoActions.loadRefreshTodosRequest,{pageSize:_pageSize})
     .then(()=>setCurrentPage(_initialPageNum+1)).catch(()=>{});
-    console.log('datasize:',data.length);
   };
 
   const handleItemPress = (item: Todo) => {
