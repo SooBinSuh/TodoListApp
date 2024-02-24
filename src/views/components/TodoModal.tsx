@@ -6,7 +6,6 @@ import {useDispatch} from 'react-redux';
 import {todoActions} from '../../store/reducers/todoSlice';
 import {TodoEditModalMode, modalActions} from '../../store/reducers/modalSlice';
 
-// export type TodoModalProps = {};
 
 export const TodoModal = (): React.JSX.Element => {
   const {
@@ -15,18 +14,11 @@ export const TodoModal = (): React.JSX.Element => {
     todoEditModalMode,
     todoEditModalId,
   } = useAppSelector(state => state.modal);
-
-  // const [content, setContent] = useState('');
   const dispatch = useDispatch();
-
   const _props: VTodoInputModalProps = {
     content: todoEditModalContent,
     isModalVisible: isTodoEditModalVisible,
     modalMode: todoEditModalMode,
-    // onModalDismiss: () => {
-    //   // dispatch(modalActions.setTodoEditModalContent(''))
-    //   // setContent('');
-    // },
     onBackgroundPress: () =>
       dispatch(modalActions.toggleTodoEditModalVisible({})),
     onChangeText: t => {

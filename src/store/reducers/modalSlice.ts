@@ -1,7 +1,6 @@
 import { PayloadAction, createSlice } from "@reduxjs/toolkit";
 
 
-
 type IModal = {
     isTodoEditModalVisible:boolean,
     todoEditModalId:number,

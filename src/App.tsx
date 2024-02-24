@@ -40,6 +40,10 @@ import TodoDetail from './views/container/TodoDetail';
 const TodoStack = createNativeStackNavigator<TodoStackParamList>();
 
 const TodoStackView = () => {
+  const error = useAppSelector(state=>state.todos.error);
+  useEffect(()=>{
+    console.log("error!:",error);
+  },[error])
   return (
     <TodoStack.Navigator initialRouteName="TodoHome">
       <TodoStack.Screen name="TodoHome" component={TodoHome} />

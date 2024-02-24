@@ -3,11 +3,13 @@ import {PayloadAction, createSlice} from '@reduxjs/toolkit';
 import Todo from '../../@types/Todo';
 import {CreateTodoRequestBody} from '../../@types/request/todo/CreateTodoRequestBody';
 import DeleteTodoRequestBody from '../../@types/request/todo/DeleteTodoRequestBody';
+import GetPagedTodoRequestBody from '../../@types/request/todo/GetPagedTodoRequestBody';
 
 export type TodoStateType = {
   isLoading: boolean;
   error: NetworkError | undefined;
   data: Todo[];
+
   idOfCompleteTodos: number[];
 };
 
@@ -40,6 +42,9 @@ const todoSlice = createSlice({
       state.isLoading = false;
       state.data = action.payload.todos;
       state.idOfCompleteTodos = action.payload.idOfCompletedTodos;
+    },
+    loadGetPagedTodosRequest:( state,action:PayloadAction<GetPagedTodoRequestBody>) =>{
+      state.isLoading = true;
     },
     loadCreateTodoRequest: (
       state,

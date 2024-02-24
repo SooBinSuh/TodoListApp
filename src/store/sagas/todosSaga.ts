@@ -19,13 +19,14 @@ import {
   readTodosFromStorage,
   writeTodosToStorage,
 } from '../../services/todoService';
-import {PayloadAction} from '@reduxjs/toolkit';
+import {PayloadAction, __DO_NOT_USE__ActionTypes} from '@reduxjs/toolkit';
 import {CreateTodoRequestBody} from '../../@types/request/todo/CreateTodoRequestBody';
 import {modalActions} from '../reducers/modalSlice';
 import UpdateTodoRequestBody from '../../@types/request/todo/UpdateTodoRequestBody';
 import {AppState} from 'react-native';
 import {RootState} from '../reducers';
 import DeleteTodoRequestBody from '../../@types/request/todo/DeleteTodoRequestBody';
+import GetPagedTodoRequestBody from '../../@types/request/todo/GetPagedTodoRequestBody';
 // import { RootState } from "@reduxjs/toolkit/query";
 
 const getTodos = (state: RootState): Todo[] => {
@@ -35,7 +36,10 @@ const getTodos = (state: RootState): Todo[] => {
 const getIdOfCompleteTodos = (state: RootState): number[]=>{
     return state.todos.idOfCompleteTodos;
 }
+
 // Todo 목록 서버에서 불러오고 동기화하기 위한 Effect
+//새로고침 : 10개만
+//다음 scroll: 10개 더 붙임
 function* loadGetTodos() {
   try {
     const {data}: AxiosResponse<Todo[]> = yield call(apiGetTodos);
@@ -51,6 +55,65 @@ function* loadGetTodos() {
       yield put(todoActions.loadTodoRequestFail(error));
     }
   }
+}
+
+function* loadGetPagedTodos(action:PayloadAction<GetPagedTodoRequestBody>){
+    try{
+        const {data}: AxiosResponse<Todo[]> = yield call(apiGetTodos);
+        const {page,pageSize} = action.payload;
+        if (data.length > page * pageSize){//data exists
+            const storageData: number[] = yield call(readTodosFromStorage);
+            //re-order
+            const _todos: Todo[] = yield select(getTodos);
+            console.log("beforesort:",_todos);
+            const slicedTodos = [...data.slice(page * pageSize,pageSize)];
+            console.log("piece:",slicedTodos);
+            let [mostRecentTodo] = _todos;
+
+            //새로 받은 데이터 반복
+            //if new data.create_at exist
+            //if newdata > oldData, oldData not undefined, put infront
+            //else push to end and resort 
+
+            slicedTodos.forEach((t)=>{
+                if(!t.create_at){
+                    throw new Error("데이터를 불러오지 못했어요");
+                }else{
+                    const newItemDate = new Date(t.create_at);
+                    if(mostRecentTodo){
+                        const date = new Date(mostRecentTodo.create_at);
+                        _todos.unshift(t);
+                        if (newItemDate < date){
+                            _todos.sort((a,b)=>{
+                                const dateA = new Date(a.create_at);
+                                const dateB = new Date(b.create_at);
+                                return (dateA > dateB) ? 1 : -1;
+                            })
+                        }
+                        [mostRecentTodo] = _todos;
+                    }
+
+                }
+            })
+            console.log("aftersort:",_todos);
+            //_todos already sorted
+            //sorted only new ones and place on top
+            //
+
+            yield put(todoActions.loadGetTodosSuccess({
+                todos: _todos,
+                idOfCompletedTodos:storageData
+            }));
+
+        }else{
+            //EOF
+            throw new Error("더 이상 불러올 데이터가 없어요");
+        }
+    }catch(e){
+        if (e instanceof Error){
+            yield put(todoActions.loadTodoRequestFail(e));
+        }
+    }
 }
 
 // toggle이후 변동사항 저장소에 저장하기 위한 Effect
