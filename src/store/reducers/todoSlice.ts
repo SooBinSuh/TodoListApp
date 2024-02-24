@@ -5,6 +5,7 @@ import {CreateTodoRequestBody} from '../../@types/request/todo/CreateTodoRequest
 import DeleteTodoRequestBody from '../../@types/request/todo/DeleteTodoRequestBody';
 import GetPagedTodoRequestBody from '../../@types/request/todo/GetPagedTodoRequestBody';
 import PromisableResponseBody from '../../@types/request/PromisableRequestBody';
+import PromisableRefreshTodoRequestBody from '../../@types/request/todo/RefreshTodoRequestBody';
 
 export type TodoStateType = {
   isLoading: boolean;
@@ -44,8 +45,9 @@ const todoSlice = createSlice({
       state.data = action.payload.todos;
       state.idOfCompleteTodos = action.payload.idOfCompletedTodos;
     },
-    loadRefreshTodosRequest: (state,action:PayloadAction<PromisableResponseBody>) =>{
+    loadRefreshTodosRequest: (state,action:PayloadAction<PromisableRefreshTodoRequestBody>) =>{
       state.isLoading = true;
+      state.data = [];
     },
     loadRefreshTodosRequestSuccess: (state,action:PayloadAction<Todo[]>) =>{
       state.isLoading = false;

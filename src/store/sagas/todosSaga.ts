@@ -28,6 +28,7 @@ import {RootState} from '../reducers';
 import DeleteTodoRequestBody from '../../@types/request/todo/DeleteTodoRequestBody';
 import GetPagedTodoRequestBody from '../../@types/request/todo/GetPagedTodoRequestBody';
 import PromisableResponseBody from '../../@types/request/PromisableRequestBody';
+import PromisableRefreshTodoRequestBody from '../../@types/request/todo/RefreshTodoRequestBody';
 // import { RootState } from "@reduxjs/toolkit/query";
 
 const getTodos = (state: RootState): Todo[] => {
@@ -39,10 +40,10 @@ const getIdOfCompleteTodos = (state: RootState): number[]=>{
 }
 const getModalIsVisible = (state:RootState):boolean=>state.modal.isTodoEditModalVisible;
 
-function* loadRefreshTodos(action:PayloadAction<PromisableResponseBody>){
+function* loadRefreshTodos(action:PayloadAction<PromisableRefreshTodoRequestBody>){
   try{
     const {data}: AxiosResponse<Todo[]> = yield call(apiGetTodos);
-    yield put(todoActions.loadRefreshTodosRequestSuccess(data));
+    yield put(todoActions.loadRefreshTodosRequestSuccess(data.slice(0,action.payload.pageSize)));
     action.payload.resolve(true);
   }catch(e){
     if (e instanceof Error){

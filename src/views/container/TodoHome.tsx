@@ -45,12 +45,13 @@ const PromisableActionWrapper = <Type extends string, Payload>(
 };
 
 const TodoList = () => {
-  const {data, idOfCompleteTodos,isLoading} = useAppSelector(state => state.todos);
-  const [currentPage, setCurrentPage] = useState(0);
-  const navigation = useNavigation<RootNavigationProp>();
   const _pageSize = 10;
-  
+  const _initialPageNum = 0;
+  const {data, idOfCompleteTodos,isLoading} = useAppSelector(state => state.todos);
+  const [currentPage, setCurrentPage] = useState(_initialPageNum);
+  const navigation = useNavigation<RootNavigationProp>();
   useEffect(() => {
+    console.log("HERE");
     PromisableActionWrapper(dispatch, todoActions.loadGetPagedTodosRequest, {
       page: currentPage,
       pageSize: _pageSize,
@@ -59,7 +60,7 @@ const TodoList = () => {
       .catch(() => {});
 
     return () => {
-      setCurrentPage(0);
+      setCurrentPage(_initialPageNum);
     };
   }, []);
 
@@ -90,6 +91,9 @@ const TodoList = () => {
   };
   const handleRefresh = () => {
     console.log('swiped UP for refresh');
+    PromisableActionWrapper(dispatch,todoActions.loadRefreshTodosRequest,{pageSize:_pageSize})
+    .then(()=>setCurrentPage(_initialPageNum+1)).catch(()=>{});
+    console.log('datasize:',data.length);
   };
 
   const handleItemPress = (item: Todo) => {
@@ -103,12 +107,12 @@ const TodoList = () => {
       refreshing={isLoading}
       renderItem={({item, index}) => (
         <Pressable
-          key={item.id}
           style={{height: 200}}
           onPress={() => handleItemPress(item)}>
           <TodoListItem item={item} handleToggleChange={handleToggleChange} />
         </Pressable>
       )}
+      keyExtractor={item=>`${item.id}`}
       onEndReached={() => handleOnEndReached()}
       onRefresh={()=>handleRefresh()}
     />
