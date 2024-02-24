@@ -1,79 +1,21 @@
-This is a new [**React Native**](https://reactnative.dev) project, bootstrapped using [`@react-native-community/cli`](https://github.com/react-native-community/cli).
+# 기본 설명
 
-# Getting Started
+- VAC 패턴 적용
+   - /src/views/components, /src/views/container 내에는 Layout JSX을 제외한 비즈니스 로직을 구현했습니다.
+   - /src/views/vac 내에 비즈니스 로직을 제외한 JSX만을 반환하도록 구현했습니다.
 
->**Note**: Make sure you have completed the [React Native - Environment Setup](https://reactnative.dev/docs/environment-setup) instructions till "Creating a new application" step, before proceeding.
+- State/Action/Reducer 패턴 적용
+   - Redux-Toolkit, Redux-Saga를 사용하여 API 호출은 Middleware인 Redux-Saga를 사용하여 구현했습니다.
+   - 비즈니스 로직(Validation 및 데이터 처리)는 최대한 MiddleWare에서 처리 후, Reducer로 Dispatch하도록 구현했습니다.
+   - State는 모달을 관리하는 modal reducer와 todo를 관리하는 todo reducer로 분리했습니다.
 
-## Step 1: Start the Metro Server
 
-First, you will need to start **Metro**, the JavaScript _bundler_ that ships _with_ React Native.
+# Challenging
 
-To start Metro, run the following command from the _root_ of your React Native project:
+- Todo item 완수 여부를 내부 저장하여 서버 데이터와 병합하는 로직
+   - 서버 데이터와 내부 저장 데이터의 대조를 최소한으로 실행하기 위해 완수한 Todo Object들의 Id 배열을 직렬화하여 내부 저장소에 저장했습니다.
+   - Challenging한 부분은 만약 완수한 Todo들의 ID 배열의 길이가 매우 커진다면, TodoList에 Render할 뷰의 ID 검색을 어떻게 빠르게 할 것인가? 였습니다. 구현을 완성하지 못했지만, 한가지 방법으로는 정렬된 배열의 형태로 완수한 Todo의 ID 배열을 내부 저장소에 저장한다면, 탐색을 더 빨리 할 수 있다고 생각했습니다.
 
-```bash
-# using npm
-npm start
-
-# OR using Yarn
-yarn start
-```
-
-## Step 2: Start your Application
-
-Let Metro Bundler run in its _own_ terminal. Open a _new_ terminal from the _root_ of your React Native project. Run the following command to start your _Android_ or _iOS_ app:
-
-### For Android
-
-```bash
-# using npm
-npm run android
-
-# OR using Yarn
-yarn android
-```
-
-### For iOS
-
-```bash
-# using npm
-npm run ios
-
-# OR using Yarn
-yarn ios
-```
-
-If everything is set up _correctly_, you should see your new app running in your _Android Emulator_ or _iOS Simulator_ shortly provided you have set up your emulator/simulator correctly.
-
-This is one way to run your app — you can also run it directly from within Android Studio and Xcode respectively.
-
-## Step 3: Modifying your App
-
-Now that you have successfully run the app, let's modify it.
-
-1. Open `App.tsx` in your text editor of choice and edit some lines.
-2. For **Android**: Press the <kbd>R</kbd> key twice or select **"Reload"** from the **Developer Menu** (<kbd>Ctrl</kbd> + <kbd>M</kbd> (on Window and Linux) or <kbd>Cmd ⌘</kbd> + <kbd>M</kbd> (on macOS)) to see your changes!
-
-   For **iOS**: Hit <kbd>Cmd ⌘</kbd> + <kbd>R</kbd> in your iOS Simulator to reload the app and see your changes!
-
-## Congratulations! :tada:
-
-You've successfully run and modified your React Native App. :partying_face:
-
-### Now what?
-
-- If you want to add this new React Native code to an existing application, check out the [Integration guide](https://reactnative.dev/docs/integration-with-existing-apps).
-- If you're curious to learn more about React Native, check out the [Introduction to React Native](https://reactnative.dev/docs/getting-started).
-
-# Troubleshooting
-
-If you can't get this to work, see the [Troubleshooting](https://reactnative.dev/docs/troubleshooting) page.
-
-# Learn More
-
-To learn more about React Native, take a look at the following resources:
-
-- [React Native Website](https://reactnative.dev) - learn more about React Native.
-- [Getting Started](https://reactnative.dev/docs/environment-setup) - an **overview** of React Native and how setup your environment.
-- [Learn the Basics](https://reactnative.dev/docs/getting-started) - a **guided tour** of the React Native **basics**.
-- [Blog](https://reactnative.dev/blog) - read the latest official React Native **Blog** posts.
-- [`@facebook/react-native`](https://github.com/facebook/react-native) - the Open Source; GitHub **repository** for React Native.
+- iOS에서 Text에 Ellipsize가 제대로 적용되지 않는 이슈
+   - New Line 문자를 포함하는 문자열이 5줄을 넘어갈시, New Line Space로 인해 ellipsize가 생략되는 현상이 있습니다.
+   - Dynamic 가로 및 세로 길이를 계산하여 문자열의 어느 Index가 마지막 Line에 잘리는지 계산하여 '...' 문자열을 추가하고자 했습니다. React Native의 Font Size System의 이해가 부족하여 Index를 찾는 로직을 구현하지 못했습니다. 

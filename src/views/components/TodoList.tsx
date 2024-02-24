@@ -40,7 +40,6 @@ const TodoList = () => {
       handleOnEndReached: ()=>handleOnEndReached(),
       handleRefresh: ()=>handleRefresh(),
     }
-    //TODO: 액션핸들러에서 결과 배열을 계산하는것이 아닌 reducer에서 처리하도록 리펙토링 필요
     const handleToggleChange = (id: number) => {
       let newArr = [...idOfCompleteTodos];
       let index = idOfCompleteTodos.indexOf(id);

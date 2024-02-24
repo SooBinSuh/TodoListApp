@@ -91,7 +91,6 @@ function* loadWriteTodosToStorage(action: PayloadAction<number[]>) {
     }
   }
 }
-//Todo 생성하기 위한 Effect
 function* loadCreateTodo(action: PayloadAction<CreateTodoRequestBody>) {
   try {
     const {data}: AxiosResponse<Todo> = yield call(

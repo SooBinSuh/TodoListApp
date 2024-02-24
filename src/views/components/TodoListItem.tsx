@@ -14,7 +14,6 @@ type TodoListItemProp = {
 const TodoListItem = ({item, handleToggleChange}: TodoListItemProp) => {
     const {idOfCompleteTodos,data} = useAppSelector(state => state.todos);
     const dispatch = useDispatch();
-    //TODO: Rendering 최적화 필요, toggle 하는 children만 re-render하게 Store 데이터 구조를 변경해야 함.
     const isComplete = useMemo(
       () => idOfCompleteTodos.includes(item.id),
       [idOfCompleteTodos],
