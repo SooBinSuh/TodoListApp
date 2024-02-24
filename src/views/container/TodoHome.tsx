@@ -6,7 +6,7 @@ import {todoActions} from '../../store/reducers/todoSlice';
 import {useDispatch} from 'react-redux';
 import {useEffect, useMemo} from 'react';
 import Todo from '../../@types/Todo';
-import {modalActions} from '../../store/reducers/modalSlice';
+import {TodoEditModalMode, modalActions} from '../../store/reducers/modalSlice';
 import {useNavigation} from '@react-navigation/native';
 
 import {RootNavigationProp, TodoStackParamList} from '../../@types/Stacks';
@@ -84,7 +84,7 @@ const TodoListItem = ({item, handleToggleChange}: TodoListItemProp) => {
     },
     handleEditPress: () => {
       console.log('will edit!');
-      dispatch(modalActions.toggleTodoEditModalVisible());
+      dispatch(modalActions.toggleTodoEditModalVisible({content:item.content,mode:TodoEditModalMode.edit,id:item.id}));
     },
   };
   return (
@@ -137,7 +137,7 @@ const TodoHome = () => {
   }, []);
 
   const handleShowModalButtonPress = () => {
-    dispatch(modalActions.toggleTodoEditModalVisible());
+    dispatch(modalActions.toggleTodoEditModalVisible({content:'',mode:TodoEditModalMode.create}));
   };
   return (
     <View style={{flex: 1}}>

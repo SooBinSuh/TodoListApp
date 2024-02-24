@@ -73,7 +73,7 @@ function* loadCreateTodo(action: PayloadAction<CreateTodoRequestBody>) {
       action.payload,
     );
     yield put(todoActions.loadCreateTodoRequestSuccess(data));
-    yield put(modalActions.toggleTodoEditModalVisible());
+    yield put(modalActions.toggleTodoEditModalVisible({}));//close modal
   } catch (e) {
     if (e instanceof Error) {
       yield put(todoActions.loadTodoRequestFail(e));
@@ -97,6 +97,7 @@ function* loadUpdateTodo(action: PayloadAction<UpdateTodoRequestBody>) {
           todo: data,
         }),
       );
+      yield put((modalActions.toggleTodoEditModalVisible({})));
     } else {
       throw new Error('업데이트를 하지 못했어요');
     }

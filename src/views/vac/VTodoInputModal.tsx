@@ -8,15 +8,18 @@ import {
   View,
 } from 'react-native';
 import {ColorConstants, SizeConstants} from '../../constants/Constants';
+import { TodoEditModalMode } from '../../store/reducers/modalSlice';
 
 export type VTodoInputModalProps = {
   content: string;
-  onModalDismiss: () => void;
   isModalVisible: boolean;
   isCreatePressable: boolean;
+  modalMode:TodoEditModalMode;
+  // onModalDismiss: () => void;
   onBackgroundPress: () => void;
   onChangeText: (t: string) => void;
-  onCreatePress: () => void;
+  onSubmitPress:()=>void;
+  // onCreatePress: () => void;
 };
 
 export const VTodoInputModal = (
@@ -25,7 +28,7 @@ export const VTodoInputModal = (
   return (
     <Modal
       transparent={true}
-      onDismiss={props.onModalDismiss}
+      // onDismiss={props.onModalDismiss}
       visible={props.isModalVisible}>
       {/* Modal */}
       <Pressable style={{flex: 1}} onPress={props.onBackgroundPress}
@@ -63,7 +66,7 @@ export const VTodoInputModal = (
                 />
                 <Pressable
                   disabled={!props.isCreatePressable}
-                  onPress={props.onCreatePress}
+                  onPress={props.onSubmitPress}
                   style={{
                     backgroundColor: ColorConstants.green30,
                     padding: SizeConstants.paddingLarge,
@@ -71,7 +74,7 @@ export const VTodoInputModal = (
                     alignItems: 'center',
                     borderRadius: SizeConstants.borderRadius,
                   }}>
-                  <Text>확인</Text>
+                  <Text>{props.modalMode == TodoEditModalMode.create ? "만들기" : "수정하기"}</Text>
                 </Pressable>
               </View>
             </TouchableWithoutFeedback>
