@@ -27,6 +27,7 @@ import {AppState} from 'react-native';
 import {RootState} from '../reducers';
 import DeleteTodoRequestBody from '../../@types/request/todo/DeleteTodoRequestBody';
 import GetPagedTodoRequestBody from '../../@types/request/todo/GetPagedTodoRequestBody';
+import PromisableResponseBody from '../../@types/request/PromisableRequestBody';
 // import { RootState } from "@reduxjs/toolkit/query";
 
 const getTodos = (state: RootState): Todo[] => {
@@ -38,26 +39,18 @@ const getIdOfCompleteTodos = (state: RootState): number[]=>{
 }
 const getModalIsVisible = (state:RootState):boolean=>state.modal.isTodoEditModalVisible;
 
-// Todo 목록 서버에서 불러오고 동기화하기 위한 Effect
-//새로고침 : 10개만
-//다음 scroll: 10개 더 붙임
-function* loadGetTodos() {
-  try {
+function* loadRefreshTodos(action:PayloadAction<PromisableResponseBody>){
+  try{
     const {data}: AxiosResponse<Todo[]> = yield call(apiGetTodos);
-    const storageData: number[] = yield call(readTodosFromStorage);
-    yield put(
-      todoActions.loadGetTodosSuccess({
-        todos: data,
-        idOfCompletedTodos: storageData,
-      }),
-    );
-  } catch (error) {
-    if (error instanceof Error) {
-      yield put(todoActions.loadTodoRequestFail(error));
+    yield put(todoActions.loadRefreshTodosRequestSuccess(data));
+    action.payload.resolve(true);
+  }catch(e){
+    if (e instanceof Error){
+      yield put(todoActions.loadTodoRequestFail(e));
+      action.payload.reject();
     }
   }
 }
-
 function* loadGetPagedTodos(action:PayloadAction<GetPagedTodoRequestBody>){
     try{
         const {data}: AxiosResponse<Todo[]> = yield call(apiGetTodos);
@@ -67,7 +60,7 @@ function* loadGetPagedTodos(action:PayloadAction<GetPagedTodoRequestBody>){
             //re-order
             const _todos: Todo[] = yield select(getTodos);//returns immutable
             const slicedTodos = [...data.slice(page * pageSize,(page*pageSize)+pageSize)];
-            
+
             yield put(todoActions.loadGetTodosSuccess({
                 todos: _todos.concat(slicedTodos),
                 idOfCompletedTodos:storageData
@@ -172,10 +165,10 @@ function* loadDeleteTodo(action: PayloadAction<DeleteTodoRequestBody>) {
 }
 
 export default function* todoSaga() {
-  yield takeLatest(todoActions.loadGetTodosRequest, loadGetTodos);
   yield takeLatest(todoActions.toggleCompleteById, loadWriteTodosToStorage);
   yield takeLatest(todoActions.loadCreateTodoRequest, loadCreateTodo);
   yield takeLatest(todoActions.loadUpdateTodoRequest, loadUpdateTodo);
   yield takeLatest(todoActions.loadDeleteTodoRequest,loadDeleteTodo);
   yield takeLatest(todoActions.loadGetPagedTodosRequest,loadGetPagedTodos);
+  yield takeLatest(todoActions.loadRefreshTodosRequest,loadRefreshTodos);
 }

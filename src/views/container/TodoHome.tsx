@@ -19,42 +19,49 @@ import {useNavigation} from '@react-navigation/native';
 
 import {RootNavigationProp, TodoStackParamList} from '../../@types/Stacks';
 import createYesOrNoAlert from '../components/MyAlert';
-import {Dispatch} from '@reduxjs/toolkit';
+import {
+  ActionCreatorWithPayload,
+  CaseReducerActions,
+  Dispatch,
+  current,
+} from '@reduxjs/toolkit';
 
 
-//Reducer가 성공했을 경우에만 다음 페이지를 로딩하고자 Promise를 감쌌다.
-const getTodoAsyncCreator = (
+
+//Promise를 반환하는 Wrapper
+const PromisableActionWrapper = <Type extends string, Payload>(
   dispatch: Dispatch,
-  payload: {page: number; pageSize: number},
+  fn: ActionCreatorWithPayload<Payload, Type>,
+  payload: {},
 ) => {
-  return new Promise((resolve, reject) =>
-    dispatch(
-      todoActions.loadGetPagedTodosRequest({
-        page: payload.page,
-        pageSize: payload.pageSize,
-        resolve: resolve,
-        reject: reject,
-      }),
-    ),
-  );
+  return new Promise((resolve, reject) => {
+    try {
+      const newPayload: Payload = {...payload, resolve, reject} as Payload;
+      dispatch(fn(newPayload));
+    } catch (e) {
+      reject();
+    }
+  });
 };
 
 const TodoList = () => {
-  const {data, idOfCompleteTodos} = useAppSelector(state => state.todos);
+  const {data, idOfCompleteTodos,isLoading} = useAppSelector(state => state.todos);
   const [currentPage, setCurrentPage] = useState(0);
-  const _pageSize = 3;
+  const navigation = useNavigation<RootNavigationProp>();
+  const _pageSize = 10;
+  
   useEffect(() => {
-    getTodoAsyncCreator(dispatch, {page: currentPage, pageSize: _pageSize})
-      .then(() => {
-        setCurrentPage(currentPage + 1);
-      }).catch()
+    PromisableActionWrapper(dispatch, todoActions.loadGetPagedTodosRequest, {
+      page: currentPage,
+      pageSize: _pageSize,
+    })
+      .then(() => setCurrentPage(currentPage + 1))
+      .catch(() => {});
 
     return () => {
       setCurrentPage(0);
     };
   }, []);
-
-  const navigation = useNavigation<RootNavigationProp>();
 
   const dispatch = useDispatch();
 
@@ -70,11 +77,19 @@ const TodoList = () => {
     dispatch(todoActions.toggleCompleteById(newArr));
   };
   const handleOnEndReached = () => {
-    console.log('onEndReached!current PAge:',currentPage);
-    getTodoAsyncCreator(dispatch, {page: currentPage, pageSize: _pageSize})
+    console.log('onEndReached!current PAge:', currentPage);
+
+    PromisableActionWrapper(dispatch, todoActions.loadGetPagedTodosRequest, {
+      page: currentPage,
+      pageSize: _pageSize,
+    })
       .then(() => {
         setCurrentPage(currentPage + 1);
-      }).catch()
+      })
+      .catch(() => {});
+  };
+  const handleRefresh = () => {
+    console.log('swiped UP for refresh');
   };
 
   const handleItemPress = (item: Todo) => {
@@ -85,12 +100,17 @@ const TodoList = () => {
     <FlatList
       contentContainerStyle={{paddingHorizontal: SizeConstants.paddingRegular}}
       data={data}
+      refreshing={isLoading}
       renderItem={({item, index}) => (
-        <Pressable key={item.id} style={{height:200}} onPress={()=>handleItemPress(item)}>
+        <Pressable
+          key={item.id}
+          style={{height: 200}}
+          onPress={() => handleItemPress(item)}>
           <TodoListItem item={item} handleToggleChange={handleToggleChange} />
         </Pressable>
       )}
-      onEndReached={()=>handleOnEndReached()}
+      onEndReached={() => handleOnEndReached()}
+      onRefresh={()=>handleRefresh()}
     />
   );
 };
@@ -106,7 +126,7 @@ type VTodoListItemProp = {
 const TodoListItem = ({item, handleToggleChange}: TodoListItemProp) => {
   const {idOfCompleteTodos} = useAppSelector(state => state.todos);
   const dispatch = useDispatch();
-  //TODO: Rendering 최적화 필요, toggle 하는 children만 re-render하게 변경해야함
+  //TODO: Rendering 최적화 필요, toggle 하는 children만 re-render하게 Store 데이터 구조를 변경해야 함.
   const isComplete = useMemo(
     () => idOfCompleteTodos.includes(item.id),
     [idOfCompleteTodos],
@@ -192,7 +212,6 @@ const TodoHome = () => {
   };
   return (
     <View style={{flex: 1}}>
-      
       <TodoList />
       <Pressable
         style={{

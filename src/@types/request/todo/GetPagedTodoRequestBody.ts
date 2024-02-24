@@ -1,8 +1,9 @@
+import PromisableResponseBody from "../PromisableRequestBody";
+
 type GetPagedTodoRequestBody = {
     page:number;
     pageSize:number;
-    resolve:(t:any)=>void;
-    reject:()=>void;
 }
 
-export default GetPagedTodoRequestBody
+ type PromisableGetPagedTodoRequestBody = GetPagedTodoRequestBody & PromisableResponseBody
+export default PromisableGetPagedTodoRequestBody
