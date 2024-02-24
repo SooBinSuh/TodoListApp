@@ -3,9 +3,10 @@ import { createSlice } from "@reduxjs/toolkit";
 
 type IModal = {
     isTodoEditModalVisible:boolean;
+    todoEditModalContent:string;
 }
 
-const initialState = {isTodoEditModalVisible:false} as IModal;
+const initialState = {isTodoEditModalVisible:false,todoEditModalContent:''} as IModal;
 
 const modalSlice = createSlice({
     name:'modal',

@@ -25,8 +25,6 @@ const todoSlice = createSlice({
   reducers: {
     toggleCompleteById: (state, action: PayloadAction<number[]>) => {
       state.isLoading = true;
-      // const index = state.data.findIndex(i => i.id == action.payload);
-      // state.data[index].isComplete = !state.data[index].isComplete;
     },
     toggleCompleteByIdSuccess: (state, action: PayloadAction<number[]>) => {
       state.isLoading = false;

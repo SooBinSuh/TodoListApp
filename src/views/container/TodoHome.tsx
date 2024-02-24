@@ -55,20 +55,20 @@ type TodoListItemProp = {
 };
 
 type VTodoListItemProp = {
-  showDeleteAlert: () => void;
+  handleDeletePress: () => void;
+  handleEditPress: () => void;
 };
 const TodoListItem = ({item, handleToggleChange}: TodoListItemProp) => {
   const {idOfCompleteTodos} = useAppSelector(state => state.todos);
   const dispatch = useDispatch();
   //TODO: Rendering 최적화 필요, toggle 하는 children만 re-render하게 변경해야함
-  // console.log("rendering:",item.id);
   const isComplete = useMemo(
     () => idOfCompleteTodos.includes(item.id),
     [idOfCompleteTodos],
   );
 
   const _props: VTodoListItemProp = {
-    showDeleteAlert: () => {
+    handleDeletePress: () => {
       createYesOrNoAlert({
         title: '삭제',
         body: `${item.id} 아이템을 삭제하시겠습니까?`,
@@ -78,12 +78,13 @@ const TodoListItem = ({item, handleToggleChange}: TodoListItemProp) => {
               id: item.id,
             }),
           );
-          //DELTE
         },
-        handleNO: () => {
-          //nothing
-        },
+        handleNO: () => {},
       });
+    },
+    handleEditPress: () => {
+      console.log('will edit!');
+      dispatch(modalActions.toggleTodoEditModalVisible());
     },
   };
   return (
@@ -95,7 +96,19 @@ const TodoListItem = ({item, handleToggleChange}: TodoListItemProp) => {
       <View style={{flexDirection: 'row', alignItems: 'center'}}>
         <Text style={{flex: 1}}>{item.content}</Text>
         <Pressable
-          onPress={_props.showDeleteAlert}
+          onPress={_props.handleEditPress}
+          style={{
+            padding: 8,
+            backgroundColor: ColorConstants.green30,
+            borderRadius: SizeConstants.borderRadius,
+            justifyContent: 'center',
+            alignItems: 'center',
+            marginEnd: SizeConstants.paddingRegular,
+          }}>
+          <Text>수정</Text>
+        </Pressable>
+        <Pressable
+          onPress={_props.handleDeletePress}
           style={{
             padding: 8,
             backgroundColor: ColorConstants.warning30,
