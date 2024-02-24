@@ -36,6 +36,7 @@ const getTodos = (state: RootState): Todo[] => {
 const getIdOfCompleteTodos = (state: RootState): number[]=>{
     return state.todos.idOfCompleteTodos;
 }
+const getModalIsVisible = (state:RootState):boolean=>state.modal.isTodoEditModalVisible;
 
 // Todo 목록 서버에서 불러오고 동기화하기 위한 Effect
 //새로고침 : 10개만
@@ -64,47 +65,14 @@ function* loadGetPagedTodos(action:PayloadAction<GetPagedTodoRequestBody>){
         if (data.length > page * pageSize){//data exists
             const storageData: number[] = yield call(readTodosFromStorage);
             //re-order
-            const _todos: Todo[] = yield select(getTodos);
-            console.log("beforesort:",_todos);
-            const slicedTodos = [...data.slice(page * pageSize,pageSize)];
-            console.log("piece:",slicedTodos);
-            let [mostRecentTodo] = _todos;
-
-            //새로 받은 데이터 반복
-            //if new data.create_at exist
-            //if newdata > oldData, oldData not undefined, put infront
-            //else push to end and resort 
-
-            slicedTodos.forEach((t)=>{
-                if(!t.create_at){
-                    throw new Error("데이터를 불러오지 못했어요");
-                }else{
-                    const newItemDate = new Date(t.create_at);
-                    if(mostRecentTodo){
-                        const date = new Date(mostRecentTodo.create_at);
-                        _todos.unshift(t);
-                        if (newItemDate < date){
-                            _todos.sort((a,b)=>{
-                                const dateA = new Date(a.create_at);
-                                const dateB = new Date(b.create_at);
-                                return (dateA > dateB) ? 1 : -1;
-                            })
-                        }
-                        [mostRecentTodo] = _todos;
-                    }
-
-                }
-            })
-            console.log("aftersort:",_todos);
-            //_todos already sorted
-            //sorted only new ones and place on top
-            //
-
+            const _todos: Todo[] = yield select(getTodos);//returns immutable
+            const slicedTodos = [...data.slice(page * pageSize,(page*pageSize)+pageSize)];
+            
             yield put(todoActions.loadGetTodosSuccess({
-                todos: _todos,
+                todos: _todos.concat(slicedTodos),
                 idOfCompletedTodos:storageData
             }));
-
+            action.payload.resolve(true);
         }else{
             //EOF
             throw new Error("더 이상 불러올 데이터가 없어요");
@@ -112,6 +80,7 @@ function* loadGetPagedTodos(action:PayloadAction<GetPagedTodoRequestBody>){
     }catch(e){
         if (e instanceof Error){
             yield put(todoActions.loadTodoRequestFail(e));
+            action.payload.reject();
         }
     }
 }
@@ -160,7 +129,11 @@ function* loadUpdateTodo(action: PayloadAction<UpdateTodoRequestBody>) {
           todo: data,
         }),
       );
-      yield put((modalActions.toggleTodoEditModalVisible({})));
+      const isModalVisible:boolean = yield select(getModalIsVisible);
+
+      if(isModalVisible){
+        yield put((modalActions.toggleTodoEditModalVisible({})));
+      }
     } else {
       throw new Error('업데이트를 하지 못했어요');
     }
@@ -173,7 +146,6 @@ function* loadUpdateTodo(action: PayloadAction<UpdateTodoRequestBody>) {
 function* loadDeleteTodo(action: PayloadAction<DeleteTodoRequestBody>) {
   try {
     const response: AxiosResponse = yield call(apiDeleteTodo, action.payload);
-    console.log('delete response:', response);
 
     const _todos:Todo[] = yield select(getTodos);
     const indexOfTodo = _todos.findIndex((t)=>t.id === action.payload.id);
@@ -181,7 +153,6 @@ function* loadDeleteTodo(action: PayloadAction<DeleteTodoRequestBody>) {
     const indexOfCompleteTodo = _idOfCompleteTodos.findIndex((n)=> n == action.payload.id);
 
     if(indexOfTodo > -1){
-        console.log('index1:',indexOfTodo,'index2:',indexOfCompleteTodo);
         //async storage 저장
         // yield call(readTodosFromStorage)
         yield call(writeTodosToStorage,_idOfCompleteTodos.filter((n)=>n != action.payload.id));
@@ -195,7 +166,6 @@ function* loadDeleteTodo(action: PayloadAction<DeleteTodoRequestBody>) {
 
   } catch (e) {
     if (e instanceof Error) {
-        console.log('deleteerror',e);
       yield put(todoActions.loadTodoRequestFail(e));
     }
   }
@@ -207,4 +177,5 @@ export default function* todoSaga() {
   yield takeLatest(todoActions.loadCreateTodoRequest, loadCreateTodo);
   yield takeLatest(todoActions.loadUpdateTodoRequest, loadUpdateTodo);
   yield takeLatest(todoActions.loadDeleteTodoRequest,loadDeleteTodo);
+  yield takeLatest(todoActions.loadGetPagedTodosRequest,loadGetPagedTodos);
 }

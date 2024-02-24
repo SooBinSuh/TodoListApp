@@ -57,6 +57,7 @@ export const TodoDetail = (props: TodoDetailProp) => {
     handleInputChange: (t: string) => setContent(t),
     handleBackgroundPress: () => Keyboard.dismiss(),
     handleSetTodo: () => {
+      console.log("ASDF");
       dispatch(
         todoActions.loadUpdateTodoRequest({
           id: props.route.params.todo.id,

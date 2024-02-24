@@ -15,11 +15,9 @@ export type VTodoInputModalProps = {
   isModalVisible: boolean;
   isCreatePressable: boolean;
   modalMode:TodoEditModalMode;
-  // onModalDismiss: () => void;
   onBackgroundPress: () => void;
   onChangeText: (t: string) => void;
   onSubmitPress:()=>void;
-  // onCreatePress: () => void;
 };
 
 export const VTodoInputModal = (

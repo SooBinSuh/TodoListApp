@@ -54,7 +54,7 @@ const todoSlice = createSlice({
     },
     loadCreateTodoRequestSuccess: (state, action: PayloadAction<Todo>) => {
       state.isLoading = false;
-      state.data.push(action.payload);
+      state.data.unshift(action.payload);
     },
     loadUpdateTodoRequest: (
       state,

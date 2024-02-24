@@ -53,17 +53,13 @@ const TodoStackView = () => {
 };
 
 function App(): React.JSX.Element {
-  // const [isModalVisible, setModalVisible] = useState(false);
-  
   return (
     <Provider store={store}>
       <NavigationContainer>
         <SafeAreaView style={{flex: 1}}>
           <View style={{flex: 1}}>
             <TodoStackView />
-            <TodoModal
-              // handleCloseModal={toggleTodoEditModalVisible}
-            />
+            <TodoModal/>
           </View>
         </SafeAreaView>
       </NavigationContainer>

@@ -1,25 +1,64 @@
-import {Button, Pressable, ScrollView, Switch, Text, View} from 'react-native';
+import {
+  Button,
+  FlatList,
+  Pressable,
+  ScrollView,
+  Switch,
+  Text,
+  View,
+} from 'react-native';
 import {useAppSelector} from '../../hooks';
 import {ColorConstants, SizeConstants} from '../../constants/Constants';
 import {todoActions} from '../../store/reducers/todoSlice';
 
 import {useDispatch} from 'react-redux';
-import {useEffect, useMemo} from 'react';
+import {useEffect, useMemo, useReducer, useRef, useState} from 'react';
 import Todo from '../../@types/Todo';
 import {TodoEditModalMode, modalActions} from '../../store/reducers/modalSlice';
 import {useNavigation} from '@react-navigation/native';
 
 import {RootNavigationProp, TodoStackParamList} from '../../@types/Stacks';
-import {NativeStackNavigationProp} from '@react-navigation/native-stack';
 import createYesOrNoAlert from '../components/MyAlert';
+import {Dispatch} from '@reduxjs/toolkit';
+
+
+//Reducer가 성공했을 경우에만 다음 페이지를 로딩하고자 Promise를 감쌌다.
+const getTodoAsyncCreator = (
+  dispatch: Dispatch,
+  payload: {page: number; pageSize: number},
+) => {
+  return new Promise((resolve, reject) =>
+    dispatch(
+      todoActions.loadGetPagedTodosRequest({
+        page: payload.page,
+        pageSize: payload.pageSize,
+        resolve: resolve,
+        reject: reject,
+      }),
+    ),
+  );
+};
 
 const TodoList = () => {
   const {data, idOfCompleteTodos} = useAppSelector(state => state.todos);
+  const [currentPage, setCurrentPage] = useState(0);
+  const _pageSize = 3;
+  useEffect(() => {
+    getTodoAsyncCreator(dispatch, {page: currentPage, pageSize: _pageSize})
+      .then(() => {
+        setCurrentPage(currentPage + 1);
+      }).catch()
+
+    return () => {
+      setCurrentPage(0);
+    };
+  }, []);
+
   const navigation = useNavigation<RootNavigationProp>();
 
   const dispatch = useDispatch();
 
-  //TODO: 해당 로직 리팩토링 필요
+  //TODO: 액션핸들러에서 결과 배열을 계산하는것이 아닌 reducer에서 처리하도록 리펙토링 필요
   const handleToggleChange = (id: number) => {
     let newArr = [...idOfCompleteTodos];
     let index = idOfCompleteTodos.indexOf(id);
@@ -30,23 +69,29 @@ const TodoList = () => {
     }
     dispatch(todoActions.toggleCompleteById(newArr));
   };
+  const handleOnEndReached = () => {
+    console.log('onEndReached!current PAge:',currentPage);
+    getTodoAsyncCreator(dispatch, {page: currentPage, pageSize: _pageSize})
+      .then(() => {
+        setCurrentPage(currentPage + 1);
+      }).catch()
+  };
 
   const handleItemPress = (item: Todo) => {
     navigation.navigate('TodoDetail', {todo: item});
   };
 
   return (
-    <ScrollView
+    <FlatList
       contentContainerStyle={{paddingHorizontal: SizeConstants.paddingRegular}}
-      style={{flex: 1, backgroundColor: ColorConstants.background}}>
-      {data.map(todo => {
-        return (
-          <Pressable key={todo.id} onPress={() => handleItemPress(todo)}>
-            <TodoListItem item={todo} handleToggleChange={handleToggleChange} />
-          </Pressable>
-        );
-      })}
-    </ScrollView>
+      data={data}
+      renderItem={({item, index}) => (
+        <Pressable key={item.id} style={{height:200}} onPress={()=>handleItemPress(item)}>
+          <TodoListItem item={item} handleToggleChange={handleToggleChange} />
+        </Pressable>
+      )}
+      onEndReached={()=>handleOnEndReached()}
+    />
   );
 };
 type TodoListItemProp = {
@@ -84,7 +129,13 @@ const TodoListItem = ({item, handleToggleChange}: TodoListItemProp) => {
     },
     handleEditPress: () => {
       console.log('will edit!');
-      dispatch(modalActions.toggleTodoEditModalVisible({content:item.content,mode:TodoEditModalMode.edit,id:item.id}));
+      dispatch(
+        modalActions.toggleTodoEditModalVisible({
+          content: item.content,
+          mode: TodoEditModalMode.edit,
+          id: item.id,
+        }),
+      );
     },
   };
   return (
@@ -131,16 +182,17 @@ const TodoHome = () => {
   const dispatch = useDispatch();
   const {data, isLoading} = useAppSelector(state => state.todos);
 
-  useEffect(() => {
-    console.log('in useeffect');
-    dispatch(todoActions.loadGetTodosRequest());
-  }, []);
-
   const handleShowModalButtonPress = () => {
-    dispatch(modalActions.toggleTodoEditModalVisible({content:'',mode:TodoEditModalMode.create}));
+    dispatch(
+      modalActions.toggleTodoEditModalVisible({
+        content: '',
+        mode: TodoEditModalMode.create,
+      }),
+    );
   };
   return (
     <View style={{flex: 1}}>
+      
       <TodoList />
       <Pressable
         style={{
